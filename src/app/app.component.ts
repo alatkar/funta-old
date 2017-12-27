@@ -1,4 +1,7 @@
 import { Component } from '@angular/core';
+import { AuthService } from './services/auth.service';
+import { Router } from '@angular/router';
+import { UserService } from './services/user.service';
 
 @Component({
   selector: 'app-root',
@@ -7,4 +10,16 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'app';
+  constructor(private userService: UserService, private auth: AuthService, router: Router){
+    auth.user$.subscribe(user => { 
+      // No need of unsubscribe as this is root component.
+      // TODO: Implement unsubscribe
+      if(user) { // Need condition as user can log out and this will be null
+        //TODO: In future, save only when needed. 
+        userService.save(user);
+        let returnUrl = localStorage.getItem('returnUrl');
+        router.navigateByUrl(returnUrl);
+      }
+    })
+  }
 }
