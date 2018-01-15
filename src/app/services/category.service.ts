@@ -14,9 +14,17 @@ export class CategoryService {
     });
   }*/
 
-  public getCategories() {
+  public getAll() {
     return this.db
       .list('/categories', ref => ref.orderByChild('name'))
-      .snapshotChanges();
+      .snapshotChanges().map(action => {
+        // This changed from lecture due to version change
+        return action.map(
+          item => {
+            const $key = item.payload.key;
+            const data = { $key, ...item.payload.val() };
+            return data;
+        });
+      });
   }
 }

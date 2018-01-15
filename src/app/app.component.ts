@@ -14,12 +14,17 @@ export class AppComponent {
     auth.user$.subscribe(user => { 
       // No need of unsubscribe as this is root component.
       // TODO: Implement unsubscribe
-      if(user) { // Need condition as user can log out and this will be null
-        //TODO: In future, save only when needed. 
-        userService.save(user);
-        let returnUrl = localStorage.getItem('returnUrl');
-        router.navigateByUrl(returnUrl);
-      }
+      // Need condition as user can log out and this will be null
+      //TODO: In future, save only when needed. 
+      if(!user) return;
+
+      userService.save(user);
+      let returnUrl = localStorage.getItem('returnUrl');
+
+      if(!returnUrl) return;
+     
+      localStorage.removeItem('returnUrl');
+      router.navigateByUrl(returnUrl);
     })
   }
 }
