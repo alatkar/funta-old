@@ -33,13 +33,14 @@ export class ProductCardComponent implements OnInit {
   getQuantity() {
     // tslint:disable-next-line:curly
     if (!this.shoppingCart) {
-      console.log("getQuantity is zero");
+      console.log('ProductCardComponent:getQuantity=> ', 'getQuantity is zero');
       return 0;
     }
-    
 
     const item = this.shoppingCart.items[this.product.$key];
-    console.log("getQuantity is not zero ",  item, this.shoppingCart, this.product.$key);
+    if (item) {
+      console.log('ProductCardComponent:getQuantity=> ', item.quantity, item, this.shoppingCart, this.product.$key);
+    }
     return item ? item.quantity : 0;
   }
 }

@@ -1,11 +1,11 @@
+import { Observable } from 'rxjs/Observable';
 import { Product } from './../models/product';
 import { Injectable } from '@angular/core';
-import { AngularFireDatabase } from 'angularfire2/database';
+import { AngularFireDatabase, AngularFireAction } from 'angularfire2/database';
 import 'rxjs/add/operator/take';
 import 'rxjs/add/operator/map';
 import { FirebaseObjectObservable } from 'angularfire2/database-deprecated';
 import { ShoppingCart } from '../models/shopping-cart';
-import { Observable } from 'rxjs/Observable';
 
 @Injectable()
 export class ShoppingCartService {
@@ -16,10 +16,9 @@ export class ShoppingCartService {
     return this.db.list('/shopping-carts').push({dateCreated: new Date().getTime()});
   }
 
-  async getCart():Promise<Observable<ShoppingCart>> {
+  async getCart(): Promise<Observable<ShoppingCart>> {
     const cartId = await this.getOrCreateCartId();
-    return this.db.object('/shopping-carts/' + cartId).snapshotChanges().
-    map(x=>new ShoppingCart(x.payload.val().items)); 
+    return this.db.object('/shopping-carts/' + cartId).snapshotChanges().map(x => new ShoppingCart(x.payload.val().items));
   }
 
   private getItem(cartId: string, productId: string) {
@@ -33,7 +32,7 @@ export class ShoppingCartService {
 
     const result = await this.create();
     localStorage.setItem('cartId', result.key);
-    console.log(result);
+    console.log('ShoppingCartService:getOrCreateCartId => ', result);
     return result.key;
   }
 
@@ -53,7 +52,7 @@ export class ShoppingCartService {
       if (item.payload.exists()) {
         item$.update({quantity: item.payload.val().quantity + change});
       } else {
-        console.log(product);
+        console.log('ShoppingCartService:UpdateItemQuantity => ', product);
         item$.update({product: {
           // $key is reserved word and we have to use it when it is loaded
           key: product.$key,
