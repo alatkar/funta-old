@@ -9,6 +9,7 @@ export class ShoppingCart {
   get totalItemsCount() {
     let count = 0;
     // tslint:disable-next-line:forin
+    console.log('ShoppingCart:totalItemsCount ', this.items);
     for (const productId in this.items) {
       count += this.items[productId].quantity;
     }
