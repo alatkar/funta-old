@@ -1,20 +1,15 @@
-import { Product } from './../models/product';
 import { Component, OnInit, Input } from '@angular/core';
-import { ShoppingCartService } from '../services/shopping-cart.service';
+import { Product } from '../models/product';
 import { ShoppingCart } from '../models/shopping-cart';
+import { ShoppingCartService } from '../services/shopping-cart.service';
 
 @Component({
-  // tslint:disable-next-line:component-selector
-  selector: 'product-card',
-  templateUrl: './product-card.component.html',
-  styleUrls: ['./product-card.component.css']
+  selector: 'product-quantity',
+  templateUrl: './product-quantity.component.html',
+  styleUrls: ['./product-quantity.component.css']
 })
-export class ProductCardComponent implements OnInit {
-
+export class ProductQuantityComponent implements OnInit {
   @Input('product') product: Product;
-  // tslint:disable-next-line:no-input-rename
-  @Input('show-actions') showActions = true;
-  // tslint:disable-next-line:no-input-rename
   @Input('shopping-cart') shoppingCart: ShoppingCart;
 
   constructor(private shoppingCartService: ShoppingCartService) { }
@@ -25,7 +20,7 @@ export class ProductCardComponent implements OnInit {
   addToCart() {
     this.shoppingCartService.addToCart(this.product);
   }
-/*
+
   removeFromCart() {
     this.shoppingCartService.removeFromCart(this.product);
   }
@@ -43,5 +38,5 @@ export class ProductCardComponent implements OnInit {
     }
     return item ? item.quantity : 0;
   }
-  */
+
 }
