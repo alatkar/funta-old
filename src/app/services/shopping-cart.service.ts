@@ -12,13 +12,26 @@ export class ShoppingCartService {
 
   constructor(private db: AngularFireDatabase) { }
 
-  private create() {
-    return this.db.list('/shopping-carts').push({dateCreated: new Date().getTime()});
-  }
-
   async getCart(): Promise<Observable<ShoppingCart>> {
     const cartId = await this.getOrCreateCartId();
     return this.db.object('/shopping-carts/' + cartId).snapshotChanges().map(x => new ShoppingCart(x.payload.val().items));
+  }
+
+  async addToCart(product: Product) {
+    this.updateItem(product, 1);
+  }
+
+  async removeFromCart(product: Product) {
+    this.updateItem(product, -1);
+  }
+
+  async clearCart() {
+    let cartId = await this.getOrCreateCartId();
+    this.db.object('/shopping-carts/' + cartId + '/items').remove();
+  }
+
+  private create() {
+    return this.db.list('/shopping-carts').push({dateCreated: new Date().getTime()});
   }
 
   private getItem(cartId: string, productId: string) {
@@ -36,33 +49,30 @@ export class ShoppingCartService {
     return result.key;
   }
 
-  async addToCart(product: Product) {
-    this.UpdateItemQuantity(product, 1);
-  }
-
-  async removeFromCart(product: Product) {
-    this.UpdateItemQuantity(product, -1);
-  }
-
-  private async UpdateItemQuantity(product: Product, change: number) {
+  private async updateItem(product: Product, change: number) {
     const cartId = await this.getOrCreateCartId();
     const item$ = this.getItem(cartId, product.$key);
 
     item$.snapshotChanges().take(1).subscribe(item => {
-      if (item.payload.exists()) {
-        item$.update({quantity: item.payload.val().quantity + change});
-      } else {
-        console.log('ShoppingCartService:UpdateItemQuantity => ', product);
-        item$.update({product: {
+      //if (item.payload.exists()) {
+      //  item$.update({quantity: item.payload.val().quantity + change});
+      //} else {
+        let quantity =  change;
+        if (item.payload.exists()) {
+          quantity += item.payload.val().quantity; 
+        }
+
+        if(quantity === 0) item$.remove();        
+        else item$.update({ /*product: {*/
           // $key is reserved word and we have to use it when it is loaded
           key: product.$key,
           title: product.title,
           price: product.price,
           category: product.category,
           imageUrl: product.imageUrl,
-        }, quantity: 1});
+          quantity: quantity});
       }
-    });
+    );
 
   }
 }
